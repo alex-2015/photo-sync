@@ -13,31 +13,39 @@ argParser.add_argument('source', help='source directory - absolute path')
 argParser.add_argument('dest', help='destination directory - absolute path')
 args = argParser.parse_args()
 
+
 #sourceDir = '/Users/[username]/Dropbox/Camera Uploads/'
 sourceDir = args.source
+
+#make sure the path ends with '/'
 match = re.search(r'^.*/$', sourceDir)
 if not match:
-    sourceDir += str("/")
-
-#destDir = '/Users/[username]/Pictures/Photos/'
-destDir = args.dest
-match = re.search(r'^.*/$', destDir)
-if not match:
-    destDir += str("/")
+  sourceDir += str("/")
 
 if not os.path.isdir(sourceDir):
   print 'Can\'t find source directory: ' + sourceDir
   sys.exit(1)
+
+
+#destDir = '/Users/[username]/Pictures/Photos/'
+destDir = args.dest
+
+#make sure the path ends with '/'
+match = re.search(r'^.*/$', destDir)
+if not match:
+  destDir += str("/")
+
 if not os.path.isdir(destDir):
   print 'Can\'t find destination directory: ' + destDir
   sys.exit(1)
+
 
 error_files = []
 
 for root, subFolders, files in os.walk(sourceDir):
   for photo_file in files:
     try:
-      if photo_file.endswith(".jpg") or photo_file.endswith(".jpeg") or photo_file.endswith(".png") or photo_file.endswith(".gif"):
+      if photo_file.endswith((".jpg", ".jpeg", ".png", ".gif")):
         photoPath = os.path.join(root, photo_file)
         photo_date = datetime.fromtimestamp(os.path.getmtime(photoPath))
 
@@ -52,5 +60,6 @@ for root, subFolders, files in os.walk(sourceDir):
       error_files.append(photoPath)
 
 for error_file in error_files:
+  #TODO move these to an error folder
   print error_file
 
