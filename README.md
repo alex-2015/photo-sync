@@ -1,5 +1,5 @@
-##Photo Sync
-###Photo organiser script for OS X
+#Photo Sync
+##Photo organiser script for OS X
 
 This script lets you take photos from one location on your hard drive and organise them in another location.
 
