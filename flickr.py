@@ -10,7 +10,8 @@ def upload_callback(progress, done):
     print 'At %s%%' % progress
 
 def upload(fn):
-  flickr.upload(filename=fn, title=fn, description=u'', is_public=0, is_family=0, is_friend=0, callback=upload_callback, format='rest')
+  file_title = os.path.basename(fn)
+  flickr.upload(filename=fn, title=file_title, description=u'', is_public=0, is_family=0, is_friend=0, callback=upload_callback, format='rest')
   
 argParser = argparse.ArgumentParser(description='Script to upload photos to Flickr.')
 argParser.add_argument('source', help='source directory - absolute path')
