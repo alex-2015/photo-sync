@@ -1,14 +1,14 @@
 #!/Library/Frameworks/Python.framework/Versions/2.7/bin/python
 
-import sys
-import os
-import shutil
-import time
-from datetime import datetime
 import argparse
-import re
+from datetime import datetime
+import os
 from PIL import Image
 from PIL.ExifTags import TAGS
+import re
+import shutil
+import sys
+import time
 
 def get_exif_data(filename):
   ret = {}
@@ -36,39 +36,37 @@ def get_photo_dir(photo_date):
     month = "0" + month;
   return str(photo_date.year) + "-" + month
   
+def format_dir_name(dirname):
+  #make sure the path ends with '/'
+  match = re.search(r'^.*/$', dirname)
+  if not match:
+    dirname += str("/")
 
+  if not os.path.isdir(dirname):
+    print 'Can\'t find directory: ' + dirname
+    sys.exit(1)
+  
+  return dirname
+
+
+###################
+# Parse arguments #
+###################
 
 argParser = argparse.ArgumentParser(description='Script to process photos from source and move them to dest.')
 argParser.add_argument('source', help='source directory - absolute path')
 argParser.add_argument('dest', help='destination directory - absolute path')
 args = argParser.parse_args()
 
-
 #sourceDir = '/Users/[username]/Dropbox/Camera Uploads/'
-sourceDir = args.source
-
-#make sure the path ends with '/'
-match = re.search(r'^.*/$', sourceDir)
-if not match:
-  sourceDir += str("/")
-
-if not os.path.isdir(sourceDir):
-  print 'Can\'t find source directory: ' + sourceDir
-  sys.exit(1)
-
+sourceDir = format_dir_name(args.source)
 
 #destDir = '/Users/[username]/Pictures/Photos/'
-destDir = args.dest
+destDir = format_dir_name(args.dest)
 
-#make sure the path ends with '/'
-match = re.search(r'^.*/$', destDir)
-if not match:
-  destDir += str("/")
-
-if not os.path.isdir(destDir):
-  print 'Can\'t find destination directory: ' + destDir
-  sys.exit(1)
-
+###############
+# Move photos #
+###############
 
 error_files = []
 
@@ -96,6 +94,10 @@ for root, subFolders, files in os.walk(sourceDir):
     except Exception, Argument:
       print 'exception: ', Argument
       error_files.append(photoPath)
+
+#########################################################
+# Move files that couldn't be processed to a new folder #
+#########################################################
 
 for error_file in error_files:
   err_photo_dir = os.path.join(sourceDir, 'errors')
