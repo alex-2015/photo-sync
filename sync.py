@@ -23,9 +23,12 @@ def get_exif_data(filename):
     print 'Error loading file EXIF data: ', Argument
     return None
     
-def get_photo_date(exif_data):
-  date_string = exif_data['DateTime']
-  return datetime.strptime(date_string, "%Y:%m:%d %H:%M:%S")
+def get_photo_date(exif_data, photoPath):
+  if exif_data is not None and 'DateTime' in exif_data:
+    date_string = exif_data['DateTime']
+    return datetime.strptime(date_string, "%Y:%m:%d %H:%M:%S")
+  
+  return datetime.fromtimestamp(os.path.getmtime(photoPath))
   
 def get_photo_dir(photo_date):
   month = str(photo_date.month)
@@ -75,23 +78,21 @@ for root, subFolders, files in os.walk(sourceDir):
       if photo_file.endswith((".png", ".jpg", ".jpeg", ".gif", ".PNG")):
         photoPath = os.path.join(root, photo_file)
         
-        photo_data = get_exif_data(photoPath)
-        
-        if (photo_data is None):
-          print 'No exif data found'
-          error_files.append(photoPath)
-        else:
-          print photo_data
-          photo_date = get_photo_date(photo_data)
-          photo_dir = get_photo_dir(photo_date)
-          new_photo_dir = os.path.join(destDir, photo_dir)
-          print str(new_photo_dir)
-          #if no directory exists for photo_date, create it
-          if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
-            os.mkdir(new_photo_dir)
+        try:
+          photo_data = get_exif_data(photoPath)
+        except:
+          photo_data = None
+          
+        photo_date = get_photo_date(photo_data, photoPath)
+        photo_dir = get_photo_dir(photo_date)
+        new_photo_dir = os.path.join(destDir, photo_dir)
+        print str(new_photo_dir)
+        #if no directory exists for photo_date, create it
+        if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
+          os.mkdir(new_photo_dir)
 
-          shutil.copy2(photoPath, new_photo_dir)
-          os.remove(photoPath)
+        shutil.copy2(photoPath, new_photo_dir)
+        os.remove(photoPath)
     except Exception, Argument:
       print 'exception: ', Argument
       error_files.append(photoPath)
