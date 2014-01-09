@@ -81,22 +81,17 @@ for root, subFolders, files in os.walk(sourceDir):
           print 'No exif data found'
           error_files.append(photoPath)
         else:
-          print 'Processing photo'
           print photo_data
           photo_date = get_photo_date(photo_data)
-          print 'Photo date: ' + str(photo_date)
           photo_dir = get_photo_dir(photo_date)
           new_photo_dir = os.path.join(destDir, photo_dir)
           print str(new_photo_dir)
           #if no directory exists for photo_date, create it
           if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
-            print 'creating directory'
             os.mkdir(new_photo_dir)
-            print 'created directory'
 
           shutil.copy2(photoPath, new_photo_dir)
           os.remove(photoPath)
-          print 'Photo moved'
     except Exception, Argument:
       print 'exception: ', Argument
       error_files.append(photoPath)
