@@ -82,7 +82,6 @@ for root, subFolders, files in os.walk(sourceDir):
         photo_date = get_photo_date(photo_data, photoPath)
         photo_dir = get_photo_dir(photo_date)
         new_photo_dir = os.path.join(destDir, photo_dir)
-        print str(new_photo_dir)
         #if no directory exists for photo_date, create it
         if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
           os.mkdir(new_photo_dir)
