@@ -19,12 +19,12 @@ def get_exif_data(filename):
       decoded = TAGS.get(tag, tag)
       ret[decoded] = value
     return ret
-  except IOError:
-    print 'Error loading file EXIF data'
+  except Exception, Argument:
+    print 'Error loading file EXIF data: ', Argument
     return None
     
 def get_photo_date(exif_data):
-  date_string = exif_data['DateTimeOriginal']
+  date_string = exif_data['DateTime']
   return datetime.strptime(date_string, "%Y:%m:%d %H:%M:%S")
   
 def get_photo_dir(photo_date):
@@ -72,7 +72,7 @@ error_files = []
 for root, subFolders, files in os.walk(sourceDir):
   for photo_file in files:
     try:
-      if photo_file.endswith((".png", ".jpg", ".jpeg", ".gif")):
+      if photo_file.endswith((".png", ".jpg", ".jpeg", ".gif", ".PNG")):
         photoPath = os.path.join(root, photo_file)
         
         photo_data = get_exif_data(photoPath)
@@ -81,20 +81,31 @@ for root, subFolders, files in os.walk(sourceDir):
           print 'No exif data found'
           error_files.append(photoPath)
         else:
+          print 'Processing photo'
+          print photo_data
           photo_date = get_photo_date(photo_data)
+          print 'Photo date: ' + str(photo_date)
           photo_dir = get_photo_dir(photo_date)
           new_photo_dir = os.path.join(destDir, photo_dir)
+          print str(new_photo_dir)
           #if no directory exists for photo_date, create it
           if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
+            print 'creating directory'
             os.mkdir(new_photo_dir)
+            print 'created directory'
 
           shutil.copy2(photoPath, new_photo_dir)
           os.remove(photoPath)
-    except Exception:
-      print 'exception somewhere'
+          print 'Photo moved'
+    except Exception, Argument:
+      print 'exception: ', Argument
       error_files.append(photoPath)
 
 for error_file in error_files:
-  #TODO move these to an error folder
-  print error_file
+  err_photo_dir = os.path.join(sourceDir, 'errors')
+  if not os.path.exists(err_photo_dir) and not os.path.isdir(err_photo_dir):
+    os.mkdir(err_photo_dir)
+
+  shutil.copy2(error_file, err_photo_dir)
+  os.remove(error_file)
 
