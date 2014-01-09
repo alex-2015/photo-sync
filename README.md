@@ -21,7 +21,7 @@ You can set the script up using launchd, as I have done, or you can run it manua
 ####Using launchd
 Create a file in the ~/Library/LaunchAgents directory. For more information, I found [Nathan Grigg's tutorial](http://nathangrigg.net/2012/07/schedule-jobs-using-launchd/) useful.
 
-####Manual
+####Running Manually
     python sync.py /absolute/path/to/source /absolute/path/to/dest
 
 ###Contact

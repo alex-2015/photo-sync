@@ -56,10 +56,7 @@ argParser.add_argument('source', help='source directory - absolute path')
 argParser.add_argument('dest', help='destination directory - absolute path')
 args = argParser.parse_args()
 
-#sourceDir = '/Users/[username]/Dropbox/Camera Uploads/'
 sourceDir = format_dir_name(args.source)
-
-#destDir = '/Users/[username]/Pictures/Photos/'
 destDir = format_dir_name(args.dest)
 
 ###############
@@ -73,15 +70,14 @@ for root, subFolders, files in os.walk(sourceDir):
     try:
       if photo_file.endswith((".png", ".jpg", ".jpeg", ".gif", ".PNG")):
         photoPath = os.path.join(root, photo_file)
-        
         try:
           photo_data = get_exif_data(photoPath)
         except:
           photo_data = None
-          
         photo_date = get_photo_date(photo_data, photoPath)
         photo_dir = get_photo_dir(photo_date)
         new_photo_dir = os.path.join(destDir, photo_dir)
+        
         #if no directory exists for photo_date, create it
         if not os.path.exists(new_photo_dir) and not os.path.isdir(new_photo_dir):
           os.mkdir(new_photo_dir)
