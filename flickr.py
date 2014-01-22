@@ -17,6 +17,11 @@ def load_config():
 def save_config(config):
   f = open('./config_file', 'w')
   json.dump(config, f)
+  
+def sync_config(latest_folder_synced, latest_photo_synced_today):
+  config['latest_folder_synced'] = latest_folder_synced.isoformat()
+  config['latest_photo_synced'] = latest_photo_synced_today.isoformat()
+  save_config(config)
 
 def get_source_dir(source_arg):
   #make sure the path ends with '/'
@@ -40,7 +45,7 @@ def get_exif_data(filename):
       ret[decoded] = value
     return ret
   except Exception, Argument:
-    print 'Error loading file EXIF data: ', Argument
+    print 'Couldn\'t load EXIF data for file: ', Argument
     return None
     
 def get_photo_date(photoPath):
@@ -116,23 +121,21 @@ latest_photo_synced_today = latest_photo_synced
 #################
 
 error_files = []
-
 try:
   for root, subFolders, files in os.walk(sourceDir):
     print '\n'
     foldername = os.path.basename(root)
-    print 'this folder name: ' + foldername
-    print 'files: ' + files.__str__()
+    print 'Processing directory: ' + foldername
     try:
       current_folder_date = datetime.strptime(foldername, "%Y-%m")
     except Exception, Argument:
-      print 'skipping folder:', Argument
+      print 'Skipping directory:', Argument
       continue
     
     if current_folder_date >= latest_folder_synced:
       latest_folder_synced = current_folder_date
     else:
-      print 'already done'
+      print 'Directory already processed.'
       continue
     
     for photo_file in files:
@@ -143,12 +146,9 @@ try:
           photo_date = get_photo_date(photoPath)
           if photo_date > latest_photo_synced:
             upload(photoPath, flickr)
-            print 'uploading ' + photoPath
+            print 'Uploading ' + photoPath + "..."
             if (photo_date > latest_photo_synced_today):
               latest_photo_synced_today = photo_date
-              print 'setting latest photo date to ' + str(photo_date)
-          else:
-            print 'not uploading, photo date: ' + str(photo_date) + ' before latest: ' + str(latest_photo_synced)
       except Exception, Argument:
         print 'exception: ', Argument
         error_files.append(photoPath)
@@ -170,6 +170,4 @@ for error_file in error_files:
 # Save latest sync data #
 #########################
 
-config['latest_folder_synced'] = latest_folder_synced.isoformat()
-config['latest_photo_synced'] = latest_photo_synced_today.isoformat()
-save_config(config)
+sync_config(latest_folder_synced, latest_photo_synced_today)
