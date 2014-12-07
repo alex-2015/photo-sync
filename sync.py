@@ -18,7 +18,7 @@ def get_exif_data(filename):
       ret[decoded] = value
     return ret
   except Exception, Argument:
-    print 'Error loading file EXIF data: ', Argument
+    print 'Error loading file EXIF data: ', filename
     return None
     
 def get_photo_date(exif_data, photoPath):
